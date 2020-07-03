@@ -17,7 +17,7 @@ public class FlightPath2 {
         FlightPath2  fp2 = new FlightPath2();
         int c;
         //System.out.println(c);
-        String input = "8 \n LON \n JPN  \n LON PAR 6 \n MAD LON 4\n PAR ROM 5 \n ROM JPN 3\n LON OMA 8 \n OMA  BOM 7 \n TUN FRA 7 \n BOM JPN 8";
+        String input = "8 \n LON \n JPN  \n LON PAR 6 \n MAD LON 4\n PAR ROM 5 \n ROM JPN 3\n LON OMA 8 \n OMA  BOM 7 \n MAD FRA 7 \n BOM JPN 8";
         fp2.findRoutes(input);
     }
 
@@ -58,7 +58,7 @@ public class FlightPath2 {
         while(!nodeSet.isEmpty()){
             Node nearestNode = nodeSet.first();
             setNextNodes(nearestNode,mapNodes,nodeSet);
-
+            nodeSet.remove(nearestNode);
             System.out.println(nearestNode.name);
             System.out.println(nearestNode.minDistance);
         }
@@ -71,6 +71,11 @@ public class FlightPath2 {
     private void setNextNodes(Node nearestNode, HashMap<String,Node> mapNodes,TreeSet<Node> setNodes) {
         for (Segment se : nearestNode.neighbours) {
             Node next = mapNodes.get(se.destination);
+            if(next.minDistance>nearestNode.minDistance + se.length){
+                next.setMinDistance(nearestNode.minDistance + se.length);
+                nearestNode.shortestPath.add(se);
+
+            }
             next.setMinDistance(Math.min(next.minDistance,nearestNode.minDistance + se.length));
             setNodes.add(next);
         }
@@ -92,10 +97,14 @@ public class FlightPath2 {
         HashMap<String,Node> nodes = new HashMap<>();
         for (Segment segment : segmentList) {
             Node newNode = new Node(segment.origin);
-            if(segment.origin==origin){
+            Node newNodeD = new Node(segment.destination);
+
+            if(segment.origin.equals(origin)){
                 newNode.setMinDistance(0);
             }
             nodes.put(newNode.name,newNode);
+            nodes.put(newNodeD.name,newNodeD);
+
         }
         return  nodes;
     }
@@ -124,7 +133,7 @@ public class FlightPath2 {
         String name;
         List<Segment> neighbours = new ArrayList<>();
         Integer minDistance =Integer.MAX_VALUE;
-        List<Segment> shortestPath;
+        List<Segment> shortestPath = new ArrayList<>();
 
 
         Node(String name){
